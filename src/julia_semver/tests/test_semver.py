@@ -141,3 +141,52 @@ def test_prerl_match():
     s = spec("^1.2.3")
     assert not s.match(ver("1.2.3-DEV"))
     assert julia_semver.match("^1.2.3", "1.2.3-DEV")
+
+
+# From Pkg/test/pkg.jl
+def test_julia_pkg():
+    assert spec("^1.2.3") == spec("1.2.3 - 1")
+    assert spec("^1.2") == spec("1.2.0 - 1")
+    assert spec("^1") == spec("1.0.0 - 1")
+    assert spec("^0.2.3") == spec("0.2.3 - 0.2")
+    assert spec("~1.2.3") == spec("1.2.3 - 1.2")
+    assert spec("0.0.3, 1.2") == spec("0.0.3, 1.2.0 - 1")
+    assert spec("~1") == spec("1.0.0 - 1")
+    assert spec("~1.2.3, ~v1") == spec("1.2.3 - 1.2 , 1.0.0 - 1")
+
+    assert   ver("1.5.2")  in spec("1.2.3")
+    assert   ver("1.2.3")  in spec("1.2.3")
+    assert not (ver("2.0.0")  in spec("1.2.3"))
+    assert not (ver("1.2.2")  in spec("1.2.3"))
+    assert   ver("1.2.99") in spec("~1.2.3")
+    assert   ver("1.2.3")  in spec("~1.2.3")
+    assert not (ver("1.3")    in spec("~1.2.3"))
+    assert  ver("1.2.0")   in spec("1.2")
+    assert  ver("1.9.9")  in spec("1.2")
+    assert not (ver("2.0.0")  in spec("1.2"))
+    assert not (ver("1.1.9")  in spec("1.2"))
+    assert   ver("0.2.3")  in spec("0.2.3")
+    assert not (ver("0.3.0")  in spec("0.2.3"))
+    assert not (ver("0.2.2")  in spec("0.2.3"))
+    assert   ver("0.0.0")  in spec("0")
+    assert  ver("0.99.0")  in spec("0")
+    assert not (ver("1.0.0")  in spec("0"))
+    assert  ver("0.0.0")   in spec("0.0")
+    assert  ver("0.0.99")  in spec("0.0")
+    assert not (ver("0.1.0")  in spec("0.0"))
+
+    assert   ver("0.2.3") in spec("<0.2.4")
+    assert not (ver("0.2.4") in spec("<0.2.4"))
+    assert   ver("1.2.3") in spec("=1.2.3")
+    assert not (ver("1.2.4") in spec("=1.2.3"))
+    assert not (ver("1.2.2") in spec("=1.2.3"))
+    assert not (ver("0.3") in spec("0.1 - 0.2"))
+    assert ver("0.2.99") in spec("0.1 - 0.2")
+    assert ver("0.3") in spec("0.1 - 0")
+
+    with pytest.raises(ValueError):
+        spec("0.0.0")
+    with pytest.raises(ValueError):
+        spec("^^0.2.3")
+    with pytest.raises(ValueError):
+        spec("0.7 1.0")

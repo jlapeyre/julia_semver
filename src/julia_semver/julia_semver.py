@@ -28,6 +28,9 @@ def semver_interval(sstr):
     if mres is None:
         return None
     modif, major, in_minor, in_patch = mres.groups()
+    if (in_minor is not None and in_patch is not None and
+        major == '0' and in_minor == '0' and in_patch == '0'):
+        raise ValueError("invalid version: \"0.0.0\"")
     minor = '0' if in_minor is None else in_minor
     patch = '0' if in_patch is None else in_patch
     lower = f"{major}.{minor}.{patch}"
@@ -45,6 +48,9 @@ def semver_interval(sstr):
         nmajor = str(int(major) + 1)
         return f">={lower}{s}<{nmajor}.0.0"
     else: # tilde
+        if in_minor is None and in_patch is None:
+            nmajor = str(int(major) + 1)
+            return f">={lower}{s}<{nmajor}.0.0"
         nminor = str(int(minor) + 1)
         return f">={lower}{s}<{major}.{nminor}.0"
 
