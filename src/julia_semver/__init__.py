@@ -1,1 +1,1 @@
-from .julia_semver import semver_spec, version
+from .julia_semver import semver_spec, version, match

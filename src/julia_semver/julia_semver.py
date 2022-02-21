@@ -27,9 +27,7 @@ def semver_interval(sstr):
     mres = re_semver_interval.match(sstr)
     if mres is None:
         return None
-    parts = mres.groups()
-    assert len(parts) == 4
-    modif, major, in_minor, in_patch = parts
+    modif, major, in_minor, in_patch = mres.groups()
     minor = '0' if in_minor is None else in_minor
     patch = '0' if in_patch is None else in_patch
     lower = f"{major}.{minor}.{patch}"
@@ -56,9 +54,7 @@ def semver_inequality(sstr):
     mres = re_inequality_interval.match(sstr)
     if mres is None:
         return None
-    parts = mres.groups()
-    assert len(parts) == 4
-    ineq, major, in_minor, in_patch = parts
+    ineq, major, in_minor, in_patch = mres.groups()
     ineq = ineq.strip()
     if ineq == "=":
         ineq = _EXACT_VER # Use == here for SimpleSpec
@@ -72,9 +68,7 @@ def semver_hyphen(sstr):
     mres = re_hyphen_interval.match(sstr)
     if mres is None:
         return None
-    parts = mres.groups()
-    assert len(parts) == 6
-    lmajor, in_lminor, in_lpatch, umajor, in_uminor, in_upatch = parts
+    lmajor, in_lminor, in_lpatch, umajor, in_uminor, in_upatch = mres.groups()
     lminor = '0' if in_lminor is None else in_lminor
     lpatch = '0' if in_lpatch is None else in_lpatch
     uminor = '0' if in_uminor is None else in_uminor
@@ -152,3 +146,18 @@ def version(vstr):
     return semantic_version.Version(
         major=major, minor=minor, patch=patch, prerelease=prerl, build=build
     )
+
+
+def match(spec, vers):
+    """
+    Return `True` if the version `vers` satisfies the specification `spec`.
+
+    `spec` may be a string or an object created by `semver_spec`.
+    `vers` may be a string or an object created by `version`.
+    """
+    if isinstance(spec, str):
+        spec = semver_spec(spec)
+    if isinstance(vers, str):
+        vers = version(vers)
+    vers = vers.truncate(level='patch') # truncate at patch level
+    return spec.match(vers)

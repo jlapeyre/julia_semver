@@ -1,5 +1,6 @@
 from julia_semver import semver_spec as spec
 from julia_semver import version as ver
+import julia_semver
 import pytest
 
 
@@ -123,3 +124,20 @@ def test_hyphen1():
 def test_bad_hyphen():
     with pytest.raises(ValueError):
         spec('1.2.3-4.5.6')
+
+
+def test_comma1():
+    s = spec('1.2.3, ~9.1, 11')
+    assert ver('1.2.3') in s
+    assert ver('1.9.9') in s
+    assert ver('2.0.0') not in s
+    assert ver('9.1.5') in s
+    assert ver('9.2.0') not in s
+    assert ver('10') not in s
+    assert ver('11.1.2') in s
+
+
+def test_prerl_match():
+    s = spec("^1.2.3")
+    assert not s.match(ver("1.2.3-DEV"))
+    assert julia_semver.match("^1.2.3", "1.2.3-DEV")
