@@ -141,6 +141,7 @@ def test_prerl_match():
     s = spec("^1.2.3")
     assert not s.match(ver("1.2.3-DEV"))
     assert julia_semver.match("^1.2.3", "1.2.3-DEV")
+    assert not julia_semver.match("^1.2.3", "1.2.3-DEV", strict=True)
 
 
 # From Pkg/test/pkg.jl

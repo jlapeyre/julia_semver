@@ -39,8 +39,9 @@ In particular, in Julia, the prerelease is ignored when matching a version to a 
 `julia_semver.match` tries to preserve the Julia semantics:
 
 ```python
-julia_semver.match("1", "1.1.2-DEV") # True
 semver_spec("1").match(version("1.1.2-DEV")) # False
+julia_semver.match("1", "1.1.2-DEV") # True
+julia_semver.match("1", "1.1.2-DEV", strict=True) # False
 ```
 
 ## Examples

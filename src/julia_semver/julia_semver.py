@@ -154,16 +154,23 @@ def version(vstr):
     )
 
 
-def match(spec, vers):
+def match(spec, vers, strict=False):
     """
     Return `True` if the version `vers` satisfies the specification `spec`.
 
-    `spec` may be a string or an object created by `semver_spec`.
-    `vers` may be a string or an object created by `version`.
+    Parameters:
+    `spec` : str or an object created by `semver_spec`.
+        The Julia version specification
+    `vers` : str or an object created by `version`.
+        The Julia version
+     strict : bool
+        If `True` then prerelease and build versions will not match.
+        If `False`, then prelease and build are ignored when matching
     """
     if isinstance(spec, str):
         spec = semver_spec(spec)
     if isinstance(vers, str):
         vers = version(vers)
-    vers = vers.truncate(level='patch') # truncate at patch level
+    if not strict:
+        vers = vers.truncate(level='patch') # truncate at patch level
     return spec.match(vers)
